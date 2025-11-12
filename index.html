@@ -56,6 +56,16 @@ tfoot td { font-weight:bold; background:#e1f5fe; transition: background-color 0.
   </h2>
   <div id="profilesContainer"></div>
 </div>
+  div class="container">
+    <!-- SECTION CONNEXION -->
+    <div id="login-section">
+      <h2>🔐 Connexion Zakaria</h2>
+      <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="username" />
+      <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" />
+      <input type="number" id="idcode" placeholder="Numéro d'identité" />
+      <button onclick="verifierConnexion()">Se connecter</button>
+      <div class="error" id="error"></div>
+    </div>
 
 <div class="modal" id="modal">
   <div class="modal-content">
