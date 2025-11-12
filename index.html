@@ -20,12 +20,34 @@ body { font-family: Arial, sans-serif; background: #f0f8ff; margin:0; padding:20
   transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
 }
-.profile-card:hover { transform: translateY(-5px) scale(1.05); box-shadow:0 12px 25px rgba(0,0,0,0.25); }
+.profile-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.3), 0 0 15px rgba(255,255,255,0.2);
+}
+.profile-card.pulse { animation: pulse 1.5s infinite alternate; }
+
 .profile-card img { width:110px; height:110px; border-radius:50%; object-fit:cover; border:3px solid #1a237e; margin-bottom:15px; }
 .name { font-size:22px; font-weight:bold; color:#0d47a1; margin-bottom:5px; text-transform:uppercase; }
-.percentTotal { font-size:18px; color:white; font-weight:bold; margin-top:10px; padding:8px; border-radius:12px; transition: background 0.5s; }
+.percentTotal { font-size:18px; color:white; font-weight:bold; margin-top:10px; padding:8px; border-radius:12px; transition: background 0.5s, text-shadow 0.5s; }
 
 .badge { position: absolute; top:10px; left:-10px; padding:5px 12px; border-radius:12px; font-weight:bold; color:white; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.3); background:#0d47a1; }
+
+.rankBadge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  padding: 5px 10px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.rankBadge:hover { transform: scale(1.3); box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+.rankBadge:active { animation: bounce 0.3s ease; }
+.rank1 { background: gold; color: black; }
+.rank2 { background: silver; color: black; }
+.rank3 { background: #cd7f32; color: white; }
 
 .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; z-index:999; padding:20px; overflow-y:auto; }
 .modal.open { display:flex; }
@@ -41,14 +63,19 @@ tbody tr:hover { background:#e3f2fd; }
 tfoot td { font-weight:bold; background:#e1f5fe; transition: background-color 0.6s ease, color 0.6s ease; }
 .scrollable { max-height:400px; overflow-y:auto; margin-top:15px; }
 
-/* Animation vert/rouge clignotant */
-@keyframes flashGreen { 0% { background-color: #4caf50; } 50% { background-color: #a5d6a7; } 100% { background-color: #4caf50; } }
-@keyframes flashRed { 0% { background-color: #f44336; } 50% { background-color: #ef9a9a; } 100% { background-color: #f44336; } }
-.flash-green { animation: flashGreen 1s ease; }
-.flash-red { animation: flashRed 1s ease; }
+@keyframes pulse { 0% { transform: scale(1); box-shadow: 0 8px 20px rgba(0,0,0,0.15); } 50% { transform: scale(1.05); box-shadow: 0 12px 25px rgba(0,0,0,0.25); } 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(0,0,0,0.15); } }
+@keyframes shine { 0% { text-shadow: 0 0 2px #fff, 0 0 5px #fff; } 50% { text-shadow: 0 0 5px #fff, 0 0 15px #fff; } 100% { text-shadow: 0 0 2px #fff, 0 0 5px #fff; } }
+.percentTotal.shiny { animation: shine 1.5s infinite alternate; text-shadow: 0 0 5px #fff, 0 0 20px #fff, 0 0 30px #aaffaa; }
+
+@keyframes bounce { 0%,100% { transform: scale(1); } 50% { transform: scale(1.5); } }
 </style>
 </head>
 <body>
+
+<button id="adminBtn" style="padding:5px 10px; font-size:12px; cursor:pointer; background-color:yellow;">🔒 Admin</button>
+<input type="number" id="adminInput" placeholder="Mot de passe" 
+       style="display:none; padding:5px 8px; font-size:12px; border-radius:5px; border:1px solid #aaa; margin-left:5px; background-color:yellow; transition:0.3s;" 
+       maxlength="4"/>
 
 <div class="container">
   <h2 style="color:#1a237e; font-size:28px; margin-bottom:30px;">
@@ -56,15 +83,7 @@ tfoot td { font-weight:bold; background:#e1f5fe; transition: background-color 0.
   </h2>
   <div id="profilesContainer"></div>
 </div>
-    <!-- SECTION CONNEXION -->
-    <div id="login-section">
-      <h2>🔐 Connexion Zakaria</h2>
-      <input type="text" id="username" placeholder="Nom d'utilisateur" autocomplete="username" />
-      <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password" />
-      <input type="number" id="idcode" placeholder="Numéro d'identité" />
-      <button onclick="verifierConnexion()">Se connecter</button>
-      <div class="error" id="error"></div>
-    </div>
+
 <div class="modal" id="modal">
   <div class="modal-content">
     <h3 id="profileTitle"></h3>
@@ -98,12 +117,7 @@ const profiles = [
   {name:'SIENI KENANI JEMUEL',short:'SIENI',notes:{compet1:{}, compet2:{}}, total1:0, total2:0, percent1:0, percent2:0, totalPercent:0},
   {name:'BINI ADJA TEYA JOANA',short:'BINI',notes:{compet1:{}, compet2:{}}, total1:0, total2:0, percent1:0, percent2:0, totalPercent:0}
 ];
-
-// Initialisation des notes à 0
-profiles.forEach(p=>subjectsList.forEach(sub=>{
-  p.notes.compet1[sub]=0;
-  p.notes.compet2[sub]=0;
-}));
+profiles.forEach(p=>subjectsList.forEach(sub=>{p.notes.compet1[sub]=0; p.notes.compet2[sub]=0;}));
 
 const container = document.getElementById('profilesContainer');
 const modal = document.getElementById('modal');
@@ -112,13 +126,11 @@ const profileTitle = document.getElementById('profileTitle');
 const total1 = document.getElementById('total1');
 const total2 = document.getElementById('total2');
 
-// Création cartes profils avec div percentTotal
 profiles.forEach(profile=>{
   const card=document.createElement('div');
   card.className='profile-card';
   const badge=document.createElement('div');
-  badge.className='badge';
-  badge.innerText='⭐';
+  badge.className='badge'; badge.innerText='⭐';
   card.appendChild(badge);
   card.innerHTML+=`
     <img src='https://cdn-icons-png.flaticon.com/512/147/147144.png'>
@@ -129,102 +141,82 @@ profiles.forEach(profile=>{
   container.appendChild(card);
 });
 
-// Ouvrir modal
+const ADMIN_PASSWORD = "5525";
+let adminMode = false;
+const adminBtn = document.getElementById("adminBtn");
+const adminInput = document.getElementById("adminInput");
+
+const shake = [{ transform: 'translateX(0px)'},{ transform: 'translateX(-5px)'},{ transform: 'translateX(5px)'},{ transform: 'translateX(-5px)'},{ transform: 'translateX(5px)'},{ transform: 'translateX(0px)'}];
+
+adminBtn.addEventListener("click", ()=>{ adminInput.style.display = adminInput.style.display==="inline-block" ? "none" : "inline-block"; adminInput.focus(); });
+
+adminInput.addEventListener("input", ()=>{
+  let val = adminInput.value; if(val.length>4) val=val.slice(0,4); adminInput.value=val;
+  if(val === ADMIN_PASSWORD){ adminMode=true; adminInput.style.backgroundColor="#4CAF50"; makeTableEditable(true); adminBtn.innerText="🔓 Admin ON"; }
+  else if(val.length===4 && val!==ADMIN_PASSWORD){ adminMode=false; makeTableEditable(false); adminInput.style.backgroundColor="#f44336"; adminInput.animate(shake,{duration:500,iterations:1}); adminBtn.innerText="🔒 Admin"; }
+  else adminInput.style.backgroundColor="yellow";
+});
+
+function makeTableEditable(enable){
+  document.querySelectorAll("#subjectsTable td[contenteditable]").forEach(td=>{ td.contentEditable=enable; td.style.backgroundColor=enable?"#fff8dc":"transparent"; });
+}
+
 function openModal(name){
   const profile=profiles.find(p=>p.name===name);
   const competitors=profiles.filter(p=>p.name!==name);
-
   profileTitle.innerText=`Profil de ${profile.name}`;
   document.getElementById('comp1Header').innerText=competitors[0].short;
   document.getElementById('comp2Header').innerText=competitors[1].short;
-
   subjectsTable.innerHTML='';
   subjectsList.forEach(sub=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td>${sub}</td>
-      <td contenteditable="true">${profile.notes.compet1[sub]}</td>
-      <td contenteditable="true">${profile.notes.compet2[sub]}</td>
-    `;
+    tr.innerHTML=`<td>${sub}</td><td contenteditable="${adminMode}">${profile.notes.compet1[sub]}</td><td contenteditable="${adminMode}">${profile.notes.compet2[sub]}</td>`;
     subjectsTable.appendChild(tr);
-
-    const td1=tr.cells[1];
-    const td2=tr.cells[2];
-
-    td1.addEventListener('input',()=>{
-      td1.innerText=td1.innerText.replace(/[^0-9.]/g,'');
-      profile.notes.compet1[sub]=parseFloat(td1.innerText)||0;
-      updateTotals(profile);
-    });
-
-    td2.addEventListener('input',()=>{
-      td2.innerText=td2.innerText.replace(/[^0-9.]/g,'');
-      profile.notes.compet2[sub]=parseFloat(td2.innerText)||0;
-      updateTotals(profile);
-    });
+    const td1=tr.cells[1]; const td2=tr.cells[2];
+    td1.addEventListener('input',()=>{ td1.innerText=td1.innerText.replace(/[^0-9.]/g,''); profile.notes.compet1[sub]=parseFloat(td1.innerText)||0; updateTotals(profile); });
+    td2.addEventListener('input',()=>{ td2.innerText=td2.innerText.replace(/[^0-9.]/g,''); profile.notes.compet2[sub]=parseFloat(td2.innerText)||0; updateTotals(profile); });
   });
-
-  updateTotals(profile);
-  modal.classList.add('open');
+  updateTotals(profile); modal.classList.add('open');
 }
 
-// Calculer totaux et pourcentages dans modal
 function updateTotals(profile){
-  let sum1=0, sum2=0;
-  subjectsList.forEach(sub=>{
-    sum1+=profile.notes.compet1[sub];
-    sum2+=profile.notes.compet2[sub];
-  });
-  profile.total1=sum1;
-  profile.total2=sum2;
+  let sum1=0,sum2=0; subjectsList.forEach(sub=>{ sum1+=profile.notes.compet1[sub]; sum2+=profile.notes.compet2[sub]; });
+  profile.total1=sum1; profile.total2=sum2;
   const totalGeneral=sum1+sum2;
-  profile.percent1 = totalGeneral>0 ? (sum1/totalGeneral)*100 : 0;
-  profile.percent2 = totalGeneral>0 ? (sum2/totalGeneral)*100 : 0;
-
-  total1.innerHTML = `${sum1.toFixed(2)} (${profile.percent1.toFixed(2)}%)`;
-  total2.innerHTML = `${sum2.toFixed(2)} (${profile.percent2.toFixed(2)}%)`;
-
+  profile.percent1 = totalGeneral>0?(sum1/totalGeneral)*100:0;
+  profile.percent2 = totalGeneral>0?(sum2/totalGeneral)*100:0;
+  total1.innerHTML=`${sum1.toFixed(2)} (${profile.percent1.toFixed(2)}%)`;
+  total2.innerHTML=`${sum2.toFixed(2)} (${profile.percent2.toFixed(2)}%)`;
   updateProfilePercentTotal();
 }
 
-// Calculer le pourcentage total sur les cartes avec couleurs selon classement
 function updateProfilePercentTotal(){
-  // Calculer le total pour chaque profil
   profiles.forEach(profile=>{
     let competitors = profiles.filter(p=>p.name!==profile.name);
-    let totalPercent=0;
-
-    competitors.forEach(comp=>{
-      const sum = comp.total1+comp.total2;
-      if(sum>0){
-        if(comp.name===competitors[0].name){
-          totalPercent+=comp.percent1;
-        } else {
-          totalPercent+=comp.percent2;
-        }
-      }
-    });
-
+    let totalPercent=0; competitors.forEach((comp,i)=>{ if(comp.total1+comp.total2>0){ totalPercent += (i===0)?comp.percent1:comp.percent2; } });
     profile.totalPercent=totalPercent;
   });
 
-  // Trier pour classement
   const sorted = [...profiles].sort((a,b)=>b.totalPercent-a.totalPercent);
 
-  // Appliquer couleur selon rang
   profiles.forEach(profile=>{
     const card=document.querySelectorAll('.profile-card')[profiles.indexOf(profile)];
     const percentDiv=card.querySelector('.percentTotal');
-    percentDiv.innerText=profile.totalPercent.toFixed(2)+'%';
-
+    percentDiv.innerText=profile.totalPercent.toFixed(2)+'%'; percentDiv.classList.remove("shiny"); card.classList.remove("pulse");
+    card.querySelectorAll('.rankBadge').forEach(b=>b.remove());
     const rank = sorted.findIndex(p=>p.name===profile.name)+1;
-    if(rank===1) percentDiv.style.background='green';
-    else if(rank===2) percentDiv.style.background='orange';
-    else percentDiv.style.background='red';
+    const badge=document.createElement('div'); badge.classList.add('rankBadge');
+    if(rank===1){ percentDiv.style.background='green'; percentDiv.classList.add("shiny"); card.classList.add("pulse"); badge.classList.add('rank1'); badge.innerText='🏆'; }
+    else if(rank===2){ percentDiv.style.background='orange'; badge.classList.add('rank2'); badge.innerText='🥈'; }
+    else{ percentDiv.style.background='red'; badge.classList.add('rank3'); badge.innerText='🥉'; }
+    card.appendChild(badge);
   });
 }
 
-function closeModal(){ modal.classList.remove('open'); }
+function closeModal(){ modal.classList.remove('open'); makeTableEditable(adminMode); }
+
+makeTableEditable(false);
+window.addEventListener("beforeunload", ()=>{ adminMode=false; makeTableEditable(false); });
 </script>
 </body>
-    </html>
+</html>
