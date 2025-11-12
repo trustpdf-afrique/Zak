@@ -44,29 +44,20 @@ tfoot td { font-weight:bold; background:#e1f5fe; transition: background-color 0.
 <input type="number" id="adminInput" placeholder="Mot de passe" style="display:none; padding:5px 8px; font-size:12px; border-radius:5px; border:1px solid #aaa; margin-left:5px; background-color:yellow; transition:0.3s;" maxlength="4"/>
 
 <div class="container">
-  <<h2 class="welcome-text">Bienvenue aux prodiges ✨</h2>
-<style>
-.welcome-text {
-  font-family: 'Georgia', 'Palatino', serif; /* jolie police élégante */
-  font-size: 32px;
+  <h2 style="
+  background-color: white;
+  color: black;
+  font-size: 18px;
   font-weight: bold;
-  color: #0d47a1; /* bleu foncé */
+  margin-bottom: 20px;
+  white-space: nowrap;
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background: linear-gradient(90deg, #ff6f61, #ffcc70); /* dégradé lumineux */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 30px;
-  animation: shine 2s infinite alternate;
-}
-
-@keyframes shine {
-  0% { text-shadow: 0 0 5px #fff, 0 0 10px #ff6f61; }
-  50% { text-shadow: 0 0 10px #fff, 0 0 20px #ffcc70; }
-  100% { text-shadow: 0 0 5px #fff, 0 0 10px #ff6f61; }
-}
-</style>
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 10px;">
+  𝐁𝐈𝐄𝐍𝐕𝐄𝐍𝐔𝐄 𝐀𝐔𝐗 𝐏𝐑𝐎𝐃𝐈𝐆𝐄𝐒
+</h2>
+  <div id="profilesContainer"></div>
 </div>
 
 <div class="modal" id="modal">
@@ -226,4 +217,4 @@ window.addEventListener("beforeunload", ()=>{ adminMode=false; makeTableEditable
 
 </script>
 </body>
-  </html>
+</html>
