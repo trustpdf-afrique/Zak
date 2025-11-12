@@ -44,8 +44,29 @@ tfoot td { font-weight:bold; background:#e1f5fe; transition: background-color 0.
 <input type="number" id="adminInput" placeholder="Mot de passe" style="display:none; padding:5px 8px; font-size:12px; border-radius:5px; border:1px solid #aaa; margin-left:5px; background-color:yellow; transition:0.3s;" maxlength="4"/>
 
 <div class="container">
-  <h2 style="color:#1a237e; font-size:28px; margin-bottom:30px;">Découvrez le talent de nos jeunes prodiges !</h2>
-  <div id="profilesContainer"></div>
+  <<h2 class="welcome-text">Bienvenue aux prodiges ✨</h2>
+<style>
+.welcome-text {
+  font-family: 'Georgia', 'Palatino', serif; /* jolie police élégante */
+  font-size: 32px;
+  font-weight: bold;
+  color: #0d47a1; /* bleu foncé */
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ff6f61, #ffcc70); /* dégradé lumineux */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 30px;
+  animation: shine 2s infinite alternate;
+}
+
+@keyframes shine {
+  0% { text-shadow: 0 0 5px #fff, 0 0 10px #ff6f61; }
+  50% { text-shadow: 0 0 10px #fff, 0 0 20px #ffcc70; }
+  100% { text-shadow: 0 0 5px #fff, 0 0 10px #ff6f61; }
+}
+</style>
 </div>
 
 <div class="modal" id="modal">
